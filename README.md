@@ -1,6 +1,7 @@
-# quantum_key_distrib_simple
-## Project Title: Simulation of BB84 Quantum Key Distribution protocol using Python, in noiseless, noisy and eavesdropping cases. 
-### Author: Dhruv Bhatnagar.
+# BB84 Covert Channel
+## Project Title: Simulation of BB84 Quantum Key Distribution protocol covert channel using Python, in noiseless, noisy and eavesdropping cases. 
+### Simulation Author: Dhruv Bhatnagar.
+### Covert Channel Author: Albie Snyder
 
 ### File guide:
 A) Files needed for noiseless QKD experiment:
@@ -24,7 +25,7 @@ C.2) qkd_eavesdropping_2.py (contains main())
 Sample output transcripts of the programs have also been uploaded for noiseless/noisy/eavesdropping cases.
 
 ### Brief summary:
-1. This program simulates BB84 QKD using several classes for Alice, Bob, classical and quantum channels.
+1. This program simulates a covert channel in BB84 QKD using several classes for Alice, Bob, classical and quantum channels.
 2. The basic experiment is noiseless, but existing base classes can be easily overridden (OOP) to implement custom noise models/eavesdropping.
 3. The functionality to validate the key by comparing the first half of the key for bit errors has been implemented.
 4. Measurement outcomes are implemented using numpy's random number generation.
