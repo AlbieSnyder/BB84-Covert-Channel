@@ -55,10 +55,10 @@ class qkd_experiment:
         # key validation phase
         self.c_c.get_check_bits(self.b0.pre_key_check())
         self.key_efficiency, self.calc_perc_error = self.a0.key_check(self.c_c.put_check_bits())
-        self.a0.print_rem_key_alice()
-        self.b0.print_rem_key_bob()
-        print("Key efficiency obtained is ", self.key_efficiency, "%")
-        print("Qubit error-rate calculated by Alice is ", self.calc_perc_error, "%")
+        #self.a0.print_rem_key_alice()
+        #self.b0.print_rem_key_bob()
+        #print("Key efficiency obtained is ", self.key_efficiency, "%")
+        #print("Qubit error-rate calculated by Alice is ", self.calc_perc_error, "%")
         
         self.c_c.ch_reset()
         

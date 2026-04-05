@@ -77,10 +77,10 @@ class alice_con:
         for i in range(self.size_of_check_bits):
             if(check_bits_bob[i] != self.check_bits_alice[i]):
                 self.errors += 1
-                print("Error detected in keys. Bob's bit: ", check_bits_bob[i], "Alice's bit: ", self.check_bits_alice[i], "No. of errors detected: ", self.errors)
+                #print("Error detected in keys. Bob's bit: ", check_bits_bob[i], "Alice's bit: ", self.check_bits_alice[i], "No. of errors detected: ", self.errors)
         self.percent_error_rate = 100*(self.errors)/(self.size_of_check_bits)
         self.key_efficiency = 100.00*(self.size_of_key+1)/(self.s_length)
-        print("Places in which check bits differ: ", np.bitwise_xor(self.check_bits_alice, check_bits_bob))
+        #print("Places in which check bits differ: ", np.bitwise_xor(self.check_bits_alice, check_bits_bob))
         return self.key_efficiency, self.percent_error_rate
         
     def print_rem_key_alice(self):

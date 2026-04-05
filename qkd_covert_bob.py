@@ -9,11 +9,15 @@ class covert_bob(bb.bob_con):
         """
         super().__init__(s_length)
         self.state_machine = covert_channel.CovertStateMachine(PSK, trigger_length)
-        self.msg = list()
+        self.full_msg = list()
+        self.preamble_length = (s_length // 2**trigger_length).bit_length()
 
 
     def extract_msg(self, alice_bases):
         for i in range(self.s_length - 1):
             basis = alice_bases[i]
             if self.state_machine.feed(basis):
-                self.msg.append(int(alice_bases[i + 1]) ^ self.state_machine.next_keystream_bit())
+                self.full_msg.append(int(alice_bases[i + 1]) ^ self.state_machine.next_keystream_bit())
+        preamble = self.full_msg[:self.preamble_length]
+        msg_length = int(''.join(str(i) for i in preamble), 2)
+        self.msg = self.full_msg[self.preamble_length:self.preamble_length+msg_length]

@@ -2,6 +2,8 @@ import covert_channel
 import qkd_experiment_base as base
 import qkd_covert_alice
 import qkd_covert_bob
+import copy
+import numpy
 
 class covert_experiment(base.qkd_experiment):
 
@@ -20,26 +22,36 @@ class covert_experiment(base.qkd_experiment):
     def key_generation_phase(self):
         # Generating the key based on measurement basis used and covert channel misreporting
         self.c_c.get_basis_seq(self.b0.basis_seq_b)
+        true_basis_seq_a = copy.deepcopy(self.a0.basis_seq_a)
         self.a0.misreport()
+        false_basis_seq_a = copy.deepcopy(self.a0.basis_seq_a)
+        self.a0.basis_seq_a = true_basis_seq_a
         self.a0.key_gen_alice(self.c_c.put_basis_seq())
-        self.a0.print_key_alice()
+        self.a0.basis_seq_a = false_basis_seq_a
+        #self.a0.print_key_alice()
         self.c_c.ch_reset()
     
         self.c_c.get_basis_seq(self.a0.basis_seq_a)
         self.b0.extract_msg(self.a0.basis_seq_a)
         self.b0.key_gen_bob(self.c_c.put_basis_seq())
-        self.b0.print_key_bob()
+        #self.b0.print_key_bob()
         self.c_c.ch_reset()
 
     def validation_phase(self):
         super().validation_phase()
-        print("Covert Message: " + str(self.b0.msg) + "\n")
+        #print("Covert Message: " + str(self.b0.msg) + "\n")
     
 def main():
-    test_msg = [1, 0, 1, 1]
+    test_msg = [1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0]
     test_trigger_length = 7
-    experiment = covert_experiment(4096, test_msg, test_trigger_length)
-    experiment.execute()
+    QBERs = []
+
+    for i in range(1000):
+        experiment = covert_experiment(2048, test_msg, test_trigger_length)
+        experiment.execute()
+        QBERs.append(experiment.calc_perc_error)
+
+    print("Average QBER: " + str(numpy.mean(QBERs)) + "%")
 
 if __name__ == '__main__':
     main()

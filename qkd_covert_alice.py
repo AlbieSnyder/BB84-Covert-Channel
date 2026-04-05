@@ -11,14 +11,18 @@ class covert_alice(bb.alice_con):
         super().__init__(s_length)
         self.state_machine = covert_channel.CovertStateMachine(PSK, trigger_length)
         self.msg = msg
-        self.msg_index = 0
+        self.covert_index = 0
+        preamble_length = (s_length // 2**trigger_length).bit_length()
+        preamble_string = bin(len(msg))[2:].zfill(preamble_length)
+        self.preamble = [int(bit) for bit in preamble_string]
+        self.full_msg = self.preamble + msg
 
     def misreport(self):
         for i in range(self.s_length - 1):
             basis = self.basis_seq_a[i]
             if self.state_machine.feed(basis):
                 #Encodes ciphertext bit in basis array as 0 for rectilinear (+) and 1 for diagonal (×)
-                self.basis_seq_a[i + 1] = self.msg[self.msg_index] ^ self.state_machine.next_keystream_bit()
-                self.msg_index += 1
-                if self.msg_index == len(self.msg):
+                self.basis_seq_a[i + 1] = self.full_msg[self.covert_index] ^ self.state_machine.next_keystream_bit()
+                self.covert_index += 1
+                if self.covert_index == len(self.full_msg):
                     break
