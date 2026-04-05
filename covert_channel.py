@@ -8,21 +8,21 @@ from collections import deque
 
 class CovertStateMachine:
     
-    def __init__(self, PSK, k):
+    def __init__(self, PSK, trigger_length):
         self.trigger_PRNG = random.Random(PSK + "TRIGGER")
         self.keystream_PRNG = random.Random(PSK + "KEYSTREAM")
-        self.k = k
+        self.trigger_length = trigger_length
         self.buffer = deque(maxlen=self.k)
         self.generate_trigger()
 
 
     def generate_trigger(self):
-        self.trigger = [self.trigger_PRNG.getrandbits(1) for i in range(self.k)]
+        self.trigger = [self.trigger_PRNG.getrandbits(1) for i in range(self.trigger_length)]
 
     def feed(self, basis_announcment):
         self.buffer.append(basis_announcment)
         if list(self.buffer) == self.trigger:
-            self.buffer = deque(maxlen=self.k)
+            self.buffer = deque(maxlen=self.trigger_length)
             self.generate_trigger()
             return True
         else:

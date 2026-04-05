@@ -2,13 +2,13 @@ import qkd_bb84_base as bb
 import covert_channel
 
 class covert_bob(bb.bob_con):
-    def __init__(self, s_length, PSK, k):
+    def __init__(self, s_length, PSK, trigger_length):
         """
         PSK (String) - Pre-Shared Key
-        k (int) - size of trigger
+        trigger_length (int) - size of trigger
         """
         super().__init__(s_length)
-        self.state_machine = covert_channel.CovertStateMachine(PSK, k)
+        self.state_machine = covert_channel.CovertStateMachine(PSK, trigger_length)
         self.msg = list()
 
 
