@@ -12,7 +12,7 @@ class CovertStateMachine:
         self.trigger_PRNG = random.Random(PSK + "TRIGGER")
         self.keystream_PRNG = random.Random(PSK + "KEYSTREAM")
         self.trigger_length = trigger_length
-        self.buffer = deque(maxlen=self.k)
+        self.buffer = deque(maxlen=self.trigger_length)
         self.generate_trigger()
 
 

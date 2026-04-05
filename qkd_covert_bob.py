@@ -16,4 +16,4 @@ class covert_bob(bb.bob_con):
         for i in range(self.s_length - 1):
             basis = alice_bases[i]
             if self.state_machine.feed(basis):
-                self.msg.append(alice_bases[i + 1] ^ self.state_machine.next_keystream_bit())
+                self.msg.append(int(alice_bases[i + 1]) ^ self.state_machine.next_keystream_bit())

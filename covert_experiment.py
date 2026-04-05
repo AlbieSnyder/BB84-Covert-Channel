@@ -33,9 +33,9 @@ class covert_experiment(base.qkd_experiment):
 
     def validation_phase(self):
         super().validation_phase()
-        print(self.b0.msg)
+        print("Covert Message: " + str(self.b0.msg) + "\n")
     
-def main(self):
+def main():
     test_msg = [1, 0, 1, 1]
     test_trigger_length = 7
     experiment = covert_experiment(4096, test_msg, test_trigger_length)
