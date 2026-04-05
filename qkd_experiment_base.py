@@ -42,12 +42,12 @@ class qkd_experiment:
         # Generating the key based on measurement basis used.
         self.c_c.get_basis_seq(self.b0.basis_seq_b)
         self.a0.key_gen_alice(self.c_c.put_basis_seq())
-        self.a0.print_key_alice()
+        #self.a0.print_key_alice()
         self.c_c.ch_reset()
     
         self.c_c.get_basis_seq(self.a0.basis_seq_a)
         self.b0.key_gen_bob(self.c_c.put_basis_seq())
-        self.b0.print_key_bob()
+        #self.b0.print_key_bob()
         self.c_c.ch_reset()
         
     def validation_phase(self):

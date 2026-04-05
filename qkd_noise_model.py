@@ -42,6 +42,7 @@ class noisy_bob_con(bb.bob_con):
         else:            
             return np.matmul(H, state_vec)
 
+
 class noisy_q_channel(bb.q_channel):
     
     def corrupt_state(self):
@@ -54,7 +55,23 @@ class noisy_q_channel(bb.q_channel):
             # this is an X error. 
             
         self.out_st_mtx = self.temp_st_mtx        
-        
+
+#Modified subclass noisy_q_channel to accept variable error rate (0.00 to 1.00)
+class variable_noisy_q_channel(noisy_q_channel):
+    def __init__(self, error_rate):
+        self.error_rate = error_rate
+
+    def corrupt_state(self):
+        self.temp_st_mtx = self.st_mtx_in
+        self.length = np.shape(self.temp_st_mtx[0])[0] 
+        inj_error_rate = self.error_rate*(1 + np.random.uniform(-0.25,0.25))
+        self.cor = random.sample(range(1,self.length), np.floor(inj_error_rate*self.length).astype(int))
+        for i in self.cor:
+            self.temp_st_mtx[0,i], self.temp_st_mtx[1,i] = self.temp_st_mtx[1,i], self.temp_st_mtx[0,i]
+            # this is an X error. 
+            
+        self.out_st_mtx = self.temp_st_mtx
+
 class noisy_qkd_experiment(expt.qkd_experiment):
     
     def __init__(self, SIZE_TX, P_H_FAIL):
