@@ -18,11 +18,21 @@ class covert_alice(bb.alice_con):
         self.full_msg = self.preamble + msg
 
     def misreport(self):
+        counter = 0
         for i in range(self.s_length - 1):
             basis = self.basis_seq_a[i]
             if self.state_machine.feed(basis):
-                #Encodes ciphertext bit in basis array as 0 for rectilinear (+) and 1 for diagonal (×)
-                self.basis_seq_a[i + 1] = self.full_msg[self.covert_index] ^ self.state_machine.next_keystream_bit()
-                self.covert_index += 1
-                if self.covert_index == len(self.full_msg):
-                    break
+                #When the message bits end, send random data
+                if self.covert_index >= len(self.full_msg):
+                    next_bit = self.state_machine.next_keystream_bit()
+                    if self.basis_seq_a[i+1] != next_bit:
+                        counter += 1
+                    self.basis_seq_a[i+1] = next_bit
+                else:
+                    #Encodes ciphertext bit in basis array as 0 for rectilinear (+) and 1 for diagonal (×)
+                    covert_bit = self.full_msg[self.covert_index] ^ self.state_machine.next_keystream_bit()
+                    if self.basis_seq_a[i + 1] != covert_bit:
+                        counter += 1
+                    self.basis_seq_a[i + 1] = covert_bit
+                    self.covert_index += 1
+                

@@ -18,7 +18,7 @@ class variable_noisy_qkd_experiment(qkd_noise_model.noisy_qkd_experiment):
 
 def main():
     
-    s_length = 2048
+    s_length = 2**16
     error_rate = 0.03
     QBERs = []
 
@@ -26,6 +26,9 @@ def main():
         experiment = variable_noisy_qkd_experiment(s_length, error_rate)
         experiment.execute()
         QBERs.append(experiment.calc_perc_error)
+
+        if i < 5:
+            print(f"k=NA, run {i}: errors={experiment.a0.errors}, check_bits={experiment.a0.size_of_check_bits}")
 
     print("Average QBER: " + str(numpy.mean(QBERs)) + "%")
 

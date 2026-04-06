@@ -29,10 +29,12 @@ def test(k):
         c_exp = covert_experiment.covert_noise_experiment(s_length, test_msg, test_trigger_length, error_rate)
         c_exp.execute()
         covert_QBERs.append(c_exp.calc_perc_error)
-
         b_exp = baseline_experiment.variable_noisy_qkd_experiment(s_length, error_rate)
         b_exp.execute()
         baseline_QBERs.append(b_exp.calc_perc_error)
+
+        if i % 5 == 0:
+             print(i)
 
     detectability_analysis(baseline_QBERs, covert_QBERs, test_trigger_length)
     print(f"Average Baseline QBER for k={k}: {str(numpy.mean(baseline_QBERs))}% \n")
