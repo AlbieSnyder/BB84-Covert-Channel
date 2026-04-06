@@ -22,12 +22,8 @@ class covert_experiment(base.qkd_experiment):
     def key_generation_phase(self):
         # Generating the key based on measurement basis used and covert channel misreporting
         self.c_c.get_basis_seq(self.b0.basis_seq_b)
-        true_basis_seq_a = copy.deepcopy(self.a0.basis_seq_a)
         self.a0.misreport()
-        false_basis_seq_a = copy.deepcopy(self.a0.basis_seq_a)
-        self.a0.basis_seq_a = true_basis_seq_a
         self.a0.key_gen_alice(self.c_c.put_basis_seq())
-        self.a0.basis_seq_a = false_basis_seq_a
         #self.a0.print_key_alice()
         self.c_c.ch_reset()
     
@@ -40,6 +36,7 @@ class covert_experiment(base.qkd_experiment):
     def validation_phase(self):
         super().validation_phase()
         #print("Covert Message: " + str(self.b0.msg) + "\n")
+        
     
 def main():
     test_msg = [1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0]
