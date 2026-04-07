@@ -1,107 +1,85 @@
 # BB84 Covert Channel
-## Project Title: Simulation of BB84 Quantum Key Distribution protocol covert channel using Python, in noiseless, noisy and eavesdropping cases. 
-### Simulation Author: Dhruv Bhatnagar.
-### Covert Channel Author: Albie Snyder
 
-### File guide:
-A) Files needed for noiseless QKD experiment:
+A covert channel embedded in the classical sifting phase of the BB84 Quantum Key Distribution protocol. The channel transmits hidden data by intentionally misreporting basis announcements, hiding the covert payload within the hardware's expected QBER noise floor.
 
-A.1) qkd_bb84_base.py
+**Paper:** [Covert Channel via Error-Injection by Classical Misreporting in the BB84 Sifting Phase](https://arxiv.org/abs/XXXX.XXXXX) (link TBD)
 
-A.2) qkd_experiment_base.py 
+## Overview
 
-A.3) qkd_bb84_noiseless.py (contains main())
+This project extends an existing BB84 QKD simulation by [Dhruv Bhatnagar](https://github.com/dhruvbhq/quantum_key_distrib_simple) with a covert channel implementation and statistical analysis tools.
 
-B) Files needed for noise model:
-B.1) All files in A)
+## Requirements
 
-B.2) qkd_noise_model.py (contains main())
+- Python 3.10+
+- NumPy
+- SciPy
+- Matplotlib
 
-C) Eavesdropping
-C.1) All files in A)
+## Project Structure
 
-C.2) qkd_eavesdropping_2.py (contains main())
+### Base BB84 Simulation (by Dhruv Bhatnagar)
+| File | Description |
+|------|-------------|
+| `qkd_bb84_base.py` | Core classes for Alice, Bob, quantum channel, and classical channel |
+| `qkd_experiment_base.py` | Base experiment class with build, run, key generation, and validation phases |
+| `qkd_bb84_noiseless.py` | Noiseless BB84 experiment driver |
+| `qkd_noise_model.py` | Noisy channel and Hadamard gate failure models |
+| `qkd_eavesdropping_2.py` | Intercept-resend eavesdropping simulation |
 
-Sample output transcripts of the programs have also been uploaded for noiseless/noisy/eavesdropping cases.
+### Covert Channel Implementation (by Albie Snyder)
+| File | Description |
+|------|-------------|
+| `covert_channel.py` | `CovertStateMachine` class — rolling trigger mechanism, dual PRNGs, keystream |
+| `qkd_covert_alice.py` | Covert Alice subclass — basis misreporting with message preamble and padding |
+| `qkd_covert_bob.py` | Covert Bob subclass — covert bit extraction and preamble parsing |
+| `covert_experiment.py` | Noiseless covert channel experiment driver |
+| `covert_noise_experiment.py` | Noisy covert channel experiment driver |
+| `baseline_noise_experiment.py` | Baseline noisy experiment (no covert channel) for comparison |
+| `statistical_analysis.py` | KS test analysis for QBER and inter-error distance detectability |
+| `generate_figures.py` | Generates all paper figures from saved experimental data |
+| `covert_test.py` | Unit test for CovertStateMachine synchronization |
 
-### Brief summary:
-1. This program simulates a covert channel in BB84 QKD using several classes for Alice, Bob, classical and quantum channels.
-2. The basic experiment is noiseless, but existing base classes can be easily overridden (OOP) to implement custom noise models/eavesdropping.
-3. The functionality to validate the key by comparing the first half of the key for bit errors has been implemented.
-4. Measurement outcomes are implemented using numpy's random number generation.
-5. Detailed transcripts print a summary of the results of the experiment.
+### Data and Figures
+| Directory | Description |
+|-----------|-------------|
+| `Data/` | Saved NumPy arrays from 1000-trial experiments (`.npy` files) |
+| `Figures/` | Generated SVG and PNG figures for the paper |
 
-### Overview of the code/classes:
+## Quick Start
 
-#### qkd_bb84_base.py contains: 
--> class for ALice (alice_con) 
+### Run a basic covert channel demo (noiseless)
+```bash
+python covert_experiment.py
+```
+This transmits a 24-bit test message through the covert channel with trigger length k=7 and prints the recovered message.
 
---> with relevant data attributes to store qubit states/key 
+### Run a noisy covert channel experiment
+```bash
+python covert_noise_experiment.py
+```
+Same as above but with 3% channel noise simulating depolarizing errors.
 
---> methods/functions to encode/measure qubits
+### Run the full statistical analysis
+```bash
+python statistical_analysis.py <k>
+```
+where `<k>` is the trigger length (e.g., 7, 8, 9, 10). Runs 1000 baseline and 1000 covert trials, performs KS tests on QBER and inter-error distance distributions, and saves results to `.npy` files.
 
---> key generation based on Bob's bases
+### Generate figures
+```bash
+python generate_figures.py
+```
+Loads saved data from `Data/` and generates all paper figures to `Figures/`.
 
---> method to apply hadamard quantum gate
+## Key Parameters
 
--> class for Bob (bob_con) 
+| Parameter | Description | Default |
+|-----------|-------------|---------|
+| `s_length` | Number of qubits per session | 65,536 |
+| `trigger_length` (k) | Length of trigger sequence | 7 |
+| `noise_error_rate` | Channel depolarizing error rate | 0.03 |
+| `PSK` | Pre-Shared Key (string) | "topsecret" |
 
---> methods to obtain qubits transmitted by alice via the quantum channel
+## License
 
---> bases set generation (for measurement)
-
---> performing measurements using numpy's random number generating functions
-
---> method to apply Hadamard quantum gate
-
---> method to generate the key from qubits received from Alice via quantum channel
-
--> class for Quantum Channel (q_channel)
-
---> methods to get the quamtum state, corrupt it according to a desired noise model, and return the quantum state. 
-
---> (in the basic noiseless case, state corruption is just an identity).
-
--> class for Classical Channel (c_channel)
-
---> for sharing classical bits of measurement bases/part of key bits for validation.
-
-#### qkd_experiment_base.py contains:
--> class for basic QKD experiment:
-
---> utilising objects of classes Bob, Alice, classical and quantum channels.
-
---> the experiment is divided into modular phases to build the objects,
-    running the experiment for transmitting qubits from Alice to Bob, 
-    key generation phase based on bases used by Alice and Bob;
-    method to find the error rate in the generated key.
-    
---> An execute function to execute the complete experiment.
-
-
-#### qkd_bb84_noiseless.py contains:
--> execution of noiseless exeriment for 500 qubits transmitted by Alice. 
-
--> qubit error rate is 0 %; a transcript is generated.
-
-#### qkd_noise_model.py contains:
--> Overridden classes for Alice and Bob having Hadamard gates with a failure rate.
-
--> Overridden class for (noisy) quantum channel, the noisy quantum channel randomly corrupts qubits by an X error.
-
--> The noisy_qkd_experiment class is suitably overriden (only where necessary) to implement this noisy experiment for 1000 qubits.
-
--> A transcript is generated.
-
-#### qkd_eavesdropping_2.py contanins:
--> An eavesdropper's class (Eve) extended from the noiseless quantum channel
-
---> The eavesdropper demonstrated is capable of generating a basis set (either the standard basis or the Hadamard basis), and carrying out measurements of qubits transmitted by Alice
-
---> The eavesdropper returns collapsed states resulting from measurement to Bob.
-
---> The QKD experiment class is suitably extended to accommodate eavesdropping classes.
-
---> Executed for 200 qubits
-
---> A detailed transcript is generated.
+The base BB84 simulation is by [Dhruv Bhatnagar](https://github.com/dhruvbhq/quantum_key_distrib_simple). The covert channel extension is by Albert Snyder.

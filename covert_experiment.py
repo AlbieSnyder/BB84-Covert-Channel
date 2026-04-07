@@ -35,7 +35,7 @@ class covert_experiment(base.qkd_experiment):
 
     def validation_phase(self):
         super().validation_phase()
-        #print("Covert Message: " + str(self.b0.msg) + "\n")
+        print("Covert Message: " + str(self.b0.msg) + "\n")
         
     
 def main():
@@ -43,7 +43,7 @@ def main():
     test_trigger_length = 7
     QBERs = []
 
-    for i in range(1000):
+    for i in range(1):
         experiment = covert_experiment(2048, test_msg, test_trigger_length)
         experiment.execute()
         QBERs.append(experiment.calc_perc_error)
