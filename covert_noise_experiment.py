@@ -59,8 +59,9 @@ def main():
     test_msg = [1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0]
     test_trigger_length = 7
     QBERs = []
+    num_experiments = 1
 
-    for i in range(100):
+    for i in range(num_experiments):
         experiment = covert_noise_experiment(2048, test_msg, test_trigger_length, 0.03)
         experiment.execute()
         QBERs.append(experiment.calc_perc_error)

@@ -73,10 +73,15 @@ class alice_con:
         self.size_of_check_bits = np.size(check_bits_bob)
         self.check_bits_alice = self.key_arr[:self.size_of_check_bits].astype(int)
         self.rem_key_alice = self.key_arr[self.size_of_check_bits:].astype(int)
-        self.errors = 0        
+        self.errors = 0
+        self.error_locations = list()
+        self.inter_error_distances = list()
         for i in range(self.size_of_check_bits):
             if(check_bits_bob[i] != self.check_bits_alice[i]):
                 self.errors += 1
+                self.error_locations.append(i)
+                if self.errors >= 2:
+                    self.inter_error_distances.append(self.error_locations[self.errors - 1] - self.error_locations[self.errors - 2])
                 #print("Error detected in keys. Bob's bit: ", check_bits_bob[i], "Alice's bit: ", self.check_bits_alice[i], "No. of errors detected: ", self.errors)
         self.percent_error_rate = 100*(self.errors)/(self.size_of_check_bits)
         self.key_efficiency = 100.00*(self.size_of_key+1)/(self.s_length)

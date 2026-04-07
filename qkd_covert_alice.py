@@ -35,4 +35,3 @@ class covert_alice(bb.alice_con):
                         counter += 1
                     self.basis_seq_a[i + 1] = covert_bit
                     self.covert_index += 1
-                
