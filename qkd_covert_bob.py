@@ -14,10 +14,12 @@ class covert_bob(bb.bob_con):
 
 
     def extract_msg(self, alice_bases):
+        self.actual_capacity = 0
         for i in range(self.s_length - 1):
             basis = alice_bases[i]
             if self.state_machine.feed(basis):
                 self.full_msg.append(int(alice_bases[i + 1]) ^ self.state_machine.next_keystream_bit())
+                self.actual_capacity += 1
         preamble = self.full_msg[:self.preamble_length]
         msg_length = int(''.join(str(i) for i in preamble), 2)
         self.msg = self.full_msg[self.preamble_length:self.preamble_length+msg_length]

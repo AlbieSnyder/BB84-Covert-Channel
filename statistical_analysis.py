@@ -34,12 +34,14 @@ def test(k):
     test_trigger_length = k
     covert_QBERs = []
     covert_inter_errors = []
+    covert_actual_capacities = []
 
     for i in range(experiment_count):
         c_exp = covert_experiment.covert_noise_experiment(s_length, test_msg, test_trigger_length, error_rate)
         c_exp.execute()
         covert_QBERs.append(c_exp.calc_perc_error)
         covert_inter_errors.extend(c_exp.a0.inter_error_distances)
+        covert_actual_capacities.append(c_exp.b0.actual_capacity)
         b_exp = baseline_experiment.variable_noisy_qkd_experiment(s_length, error_rate)
         b_exp.execute()
         baseline_QBERs.append(b_exp.calc_perc_error)
@@ -54,10 +56,13 @@ def test(k):
     print(f"Average Baseline QBER for k={k}: {str(numpy.mean(baseline_QBERs))}% \n")
     print(f"Average Covert QBER for k={k}: {str(numpy.mean(covert_QBERs))}% \n")
     print(f"For k={k}: {str(scipy.stats.ks_2samp(baseline_QBERs, covert_QBERs))} \n")
+    print(f"Expected Covert Capacity for k={k} = {s_length / 2**k}")
+    print(f"Actual Covert Capacity for k={k} = {str(numpy.mean(covert_actual_capacities))}")
     numpy.save(f"baseline_qbers_k{k}.npy", baseline_QBERs)
     numpy.save(f"covert_qbers_k{k}.npy", covert_QBERs)
     numpy.save(f"baseline_inter_error_distances_k{k}.npy", baseline_inter_errors)
     numpy.save(f"covert_inter_error_distances_k{k}.npy", covert_inter_errors)
+    numpy.save(f"covert_actual_capacity_k{k}.npy", covert_actual_capacities)
 
 def main():
         test(int(sys.argv[1]))
