@@ -66,7 +66,26 @@ plt.savefig(f'{figure_dir}/fig1_qber_gap_vs_k.svg')
 plt.savefig(f'{figure_dir}/fig1_qber_gap_vs_k.png')
 plt.close()
 
-# FIGURE 2: QBER Detectability Curve
+# FIGURE 2: Detection Comparison - QBER vs Inter-Error p-values
+fig, ax = plt.subplots(figsize=(6, 4))
+qber_p_list = [max(qber_p_1000[k], 1e-110) for k in k_values]
+inter_p_list = [max(inter_p_1000[k], 1e-10) for k in k_values]
+ax.plot(k_values, qber_p_list, 'o-', color='#2c3e50', label='QBER analysis (1000 sessions)', linewidth=2, markersize=8)
+ax.plot(k_values, inter_p_list, 's-', color='#c0392b', label='Inter-error distance analysis (1000 sessions)', linewidth=2, markersize=8)
+ax.axhline(y=0.05, color='#333333', linestyle='--', linewidth=1, label=r'$\alpha = 0.05$')
+ax.set_yscale('log')
+ax.set_xlabel('Trigger Length (k)')
+ax.set_ylabel('KS Test p-value')
+ax.set_title('Detection Sensitivity: QBER vs Inter-Error Distance')
+ax.legend(fontsize=8)
+ax.set_xticks(k_values)
+ax.grid(True, alpha=0.2)
+plt.tight_layout()
+plt.savefig(f'{figure_dir}/fig2_detection_comparison.svg')
+plt.savefig(f'{figure_dir}/fig2_detection_comparison.png')
+plt.close()
+
+# FIGURE 3: QBER Detectability Curve
 fig, ax = plt.subplots(figsize=(7, 4.5))
 colors = {6: '#e74c3c', 7: '#e67e22', 8: '#2ecc71', 9: '#2980b9', 10: '#8e44ad'}
 for k in k_values:
@@ -75,6 +94,7 @@ for k in k_values:
 
 ax.axhline(y=0.05, color='#333333', linestyle='--', linewidth=1, label=r'$\alpha = 0.05$')
 ax.set_yscale('log')
+ax.set_xscale('log')
 ax.set_xlabel('Number of Observed Sessions')
 ax.set_ylabel('KS Test p-value')
 ax.set_title('QBER Detectability vs Number of Observed Sessions')
@@ -84,11 +104,11 @@ ax.set_xticklabels([str(n) for n in session_counts], rotation=45, ha='right')
 ax.grid(True, alpha=0.2)
 ax.set_ylim(1e-12, 2)
 plt.tight_layout()
-plt.savefig(f'{figure_dir}/fig2_detectability_curve.svg')
-plt.savefig(f'{figure_dir}/fig2_detectability_curve.png')
+plt.savefig(f'{figure_dir}/fig3_detectability_curve.svg')
+plt.savefig(f'{figure_dir}/fig3_detectability_curve.png')
 plt.close()
 
-# FIGURE 3: QBER Histograms per k value
+# FIGURE 4: QBER Histograms per k value
 fig, axes = plt.subplots(1, 5, figsize=(16, 3.5), sharey=True)
 for idx, k in enumerate(k_values):
     ax = axes[idx]
@@ -108,12 +128,12 @@ for idx, k in enumerate(k_values):
 
 fig.suptitle('QBER Distributions: Baseline vs Covert Channel', y=1.02, fontsize=13)
 plt.tight_layout()
-plt.savefig(f'{figure_dir}/fig3_qber_histograms.svg', bbox_inches='tight')
-plt.savefig(f'{figure_dir}/fig3_qber_histograms.png', bbox_inches='tight')
+plt.savefig(f'{figure_dir}/fig4_qber_histograms.svg', bbox_inches='tight')
+plt.savefig(f'{figure_dir}/fig4_qber_histograms.png', bbox_inches='tight')
 plt.close()
 
 
-# FIGURE 4: Inter-Error Distance Histograms per k value
+# FIGURE 5: Inter-Error Distance Histograms per k value
 fig, axes = plt.subplots(1, 5, figsize=(16, 3.5), sharey=True)
 for idx, k in enumerate(k_values):
     ax = axes[idx]
@@ -132,28 +152,8 @@ for idx, k in enumerate(k_values):
 
 fig.suptitle('Inter-Error Distance Distributions: Baseline vs Covert Channel', y=1.02, fontsize=13)
 plt.tight_layout()
-plt.savefig(f'{figure_dir}/fig4_inter_error_histograms.svg', bbox_inches='tight')
-plt.savefig(f'{figure_dir}/fig4_inter_error_histograms.png', bbox_inches='tight')
-plt.close()
-
-
-# FIGURE 5: Detection Comparison - QBER vs Inter-Error p-values
-fig, ax = plt.subplots(figsize=(6, 4))
-qber_p_list = [max(qber_p_1000[k], 1e-110) for k in k_values]
-inter_p_list = [max(inter_p_1000[k], 1e-10) for k in k_values]
-ax.plot(k_values, qber_p_list, 'o-', color='#2c3e50', label='QBER analysis (1000 sessions)', linewidth=2, markersize=8)
-ax.plot(k_values, inter_p_list, 's-', color='#c0392b', label='Inter-error distance analysis (1000 sessions)', linewidth=2, markersize=8)
-ax.axhline(y=0.05, color='#333333', linestyle='--', linewidth=1, label=r'$\alpha = 0.05$')
-ax.set_yscale('log')
-ax.set_xlabel('Trigger Length (k)')
-ax.set_ylabel('KS Test p-value')
-ax.set_title('Detection Sensitivity: QBER vs Inter-Error Distance')
-ax.legend(fontsize=8)
-ax.set_xticks(k_values)
-ax.grid(True, alpha=0.2)
-plt.tight_layout()
-plt.savefig(f'{figure_dir}/fig5_detection_comparison.svg')
-plt.savefig(f'{figure_dir}/fig5_detection_comparison.png')
+plt.savefig(f'{figure_dir}/fig5_inter_error_histograms.svg', bbox_inches='tight')
+plt.savefig(f'{figure_dir}/fig5_inter_error_histograms.png', bbox_inches='tight')
 plt.close()
 
 
