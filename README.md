@@ -2,8 +2,7 @@
 
 A covert channel embedded in the classical sifting phase of the BB84 Quantum Key Distribution protocol. The channel transmits hidden data by intentionally misreporting basis announcements, hiding the covert payload within the hardware's expected QBER noise floor.
 
-**Paper:** [Covert Channel via Error-Injection by Classical Misreporting in the BB84 Sifting Phase](https://arxiv.org/abs/XXXX.XXXXX) (link TBD)
-
+**Paper:** [Covert Channel via Error-Injection by Classical Misreporting in the BB84 Sifting Phase](https://doi.org/10.5281/zenodo.20289949)
 ## Overview
 
 This project extends an existing BB84 QKD simulation by [Dhruv Bhatnagar](https://github.com/dhruvbhq/quantum_key_distrib_simple) with a covert channel implementation and statistical analysis tools.
