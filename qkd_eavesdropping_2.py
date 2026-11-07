@@ -29,7 +29,7 @@ class eve_q_channel(bb.q_channel):
         for i in range(self.length):
             st = self.temp_st_mtx[:,i]
             print("In Eve: input state: ", st)
-            if(self.basis_seq_e[1] == 0):
+            if(self.basis_seq_e[i] == 0):
                 print("Measurement basis: 0/1")
             else:
                 print("Measurement basis: +/-")
