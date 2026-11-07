@@ -53,7 +53,7 @@ class covert_noise_experiment(base.qkd_experiment):
 
     def validation_phase(self):
         super().validation_phase()
-        print("Covert Message: " + str(self.b0.msg) + "\n")
+        #print("Covert Message: " + str(self.b0.msg) + "\n")
     
     
 

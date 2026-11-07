@@ -49,13 +49,12 @@ class noisy_bob_con(bb.bob_con):
 class noisy_q_channel(bb.q_channel):
     
     def corrupt_state(self):
-        self.temp_st_mtx[:, i] = XZ @ self.temp_st_mtx[:, i]
+        self.temp_st_mtx = self.st_mtx_in
         self.length = np.shape(self.temp_st_mtx[0])[0] 
         inj_error_rate = 0.15*(1 + np.random.uniform(-0.25,0.25))
         self.cor = random.sample(range(self.length), np.floor(inj_error_rate*self.length).astype(int))
         for i in self.cor:
-            self.temp_st_mtx[0,i], self.temp_st_mtx[1,i] = self.temp_st_mtx[1,i], self.temp_st_mtx[0,i]
-            # this is an X error. 
+            self.temp_st_mtx[:, i] = XZ @ self.temp_st_mtx[:, i]  # Y error (up to global phase)
             
         self.out_st_mtx = self.temp_st_mtx        
 
@@ -70,8 +69,7 @@ class variable_noisy_q_channel(noisy_q_channel):
         inj_error_rate = self.error_rate*(1 + np.random.uniform(-0.25,0.25))
         self.cor = random.sample(range(self.length), np.floor(inj_error_rate*self.length).astype(int))
         for i in self.cor:
-            self.temp_st_mtx[0,i], self.temp_st_mtx[1,i] = self.temp_st_mtx[1,i], self.temp_st_mtx[0,i]
-            # this is an X error. 
+            self.temp_st_mtx[:, i] = XZ @ self.temp_st_mtx[:, i]  # Y error (up to global phase)
             
         self.out_st_mtx = self.temp_st_mtx
 

@@ -56,7 +56,7 @@ This transmits a 24-bit test message through the covert channel with trigger len
 ```bash
 python covert_noise_experiment.py
 ```
-Same as above but with 3% channel noise simulating depolarizing errors.
+Same as above but with 3% channel noise simulating errors.
 
 ### Run the full statistical analysis
 ```bash
@@ -76,7 +76,7 @@ Loads saved data from `Data/` and generates all paper figures to `Figures/`.
 |-----------|-------------|---------|
 | `s_length` | Number of qubits per session | 65,536 |
 | `trigger_length` (k) | Length of trigger sequence | 7 |
-| `noise_error_rate` | Channel depolarizing error rate | 0.03 |
+| `noise_error_rate` | Channel error rate | 0.03 |
 | `PSK` | Pre-Shared Key (string) | "topsecret" |
 
 ## License

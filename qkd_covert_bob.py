@@ -23,3 +23,4 @@ class covert_bob(bb.bob_con):
         preamble = self.full_msg[:self.preamble_length]
         msg_length = int(''.join(str(i) for i in preamble), 2)
         self.msg = self.full_msg[self.preamble_length:self.preamble_length+msg_length]
+        

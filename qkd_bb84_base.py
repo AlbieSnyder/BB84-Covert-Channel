@@ -67,7 +67,7 @@ class alice_con:
         print("Alice's full key ")
         for i in range(self.size_of_key):
             print(self.key_arr[i].astype(int), end='')
-        print("\n Size of Alice's (full) key is: ", self.size_of_key+1)
+        print("\n Size of Alice's (full) key is: ", self.size_of_key)
         
     def key_check(self, check_bits_bob):
         self.size_of_check_bits = np.size(check_bits_bob)
@@ -163,7 +163,7 @@ class bob_con:
         print("Bob's full key ")
         for i in range(self.size_of_key):
             print(self.key_arr[i].astype(int), end='')
-        print("\n Size of Bob's (full) key is: ", self.size_of_key+1)
+        print("\n Size of Bob's (full) key is: ", self.size_of_key)
         
     def pre_key_check(self):
         self.size_of_check_bits = self.size_of_key // 2
