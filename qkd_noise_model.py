@@ -10,6 +10,9 @@ import qkd_experiment_base as expt
 import numpy as np
 import random
 
+XZ = np.array([[0.0, -1.0],
+               [1.0,  0.0]])
+
 class noisy_alice_con(bb.alice_con):
     
     def __init__(self, s_length, P_H_FAIL):
