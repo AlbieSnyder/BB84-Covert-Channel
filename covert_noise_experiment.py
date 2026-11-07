@@ -20,6 +20,8 @@ class covert_noise_experiment(base.qkd_experiment):
         super().build_phase()
         self.q_c = qkd_noise_model.variable_noisy_q_channel(self.noise_error_rate)
         self.a0 = qkd_covert_alice.covert_alice(self.s_length, self.PSK, self.trigger_length, self.msg)
+        if (self.a0.msg_over_capacity):
+                    print("Message exceeds expected capacity")
         self.b0 = qkd_covert_bob.covert_bob(self.s_length, self.PSK, self.trigger_length)
 
     def run_phase(self):
@@ -51,7 +53,7 @@ class covert_noise_experiment(base.qkd_experiment):
 
     def validation_phase(self):
         super().validation_phase()
-        #print("Covert Message: " + str(self.b0.msg) + "\n")
+        print("Covert Message: " + str(self.b0.msg) + "\n")
     
     
 
@@ -62,7 +64,7 @@ def main():
     num_experiments = 1
 
     for i in range(num_experiments):
-        experiment = covert_noise_experiment(2048, test_msg, test_trigger_length, 0.03)
+        experiment = covert_noise_experiment(8192, test_msg, test_trigger_length, 0.03)
         experiment.execute()
         QBERs.append(experiment.calc_perc_error)
 
