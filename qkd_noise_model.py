@@ -46,7 +46,7 @@ class noisy_bob_con(bb.bob_con):
 class noisy_q_channel(bb.q_channel):
     
     def corrupt_state(self):
-        self.temp_st_mtx = self.st_mtx_in
+        self.temp_st_mtx[:, i] = XZ @ self.temp_st_mtx[:, i]
         self.length = np.shape(self.temp_st_mtx[0])[0] 
         inj_error_rate = 0.15*(1 + np.random.uniform(-0.25,0.25))
         self.cor = random.sample(range(self.length), np.floor(inj_error_rate*self.length).astype(int))
