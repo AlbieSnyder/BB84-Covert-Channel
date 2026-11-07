@@ -58,9 +58,9 @@ class alice_con:
         self.temp_key_arr = np.zeros(self.s_length)
         self.size_of_key = 0
         for i in range(self.s_length):
-            if(self.basis_seq_a[i] == bob_basis_seq[i]):
+            if self.basis_seq_a[i] == bob_basis_seq[i]:
+                self.temp_key_arr[self.size_of_key] = self.states_seq_a[i]
                 self.size_of_key += 1
-                self.temp_key_arr[i] = self.states_seq_a[i]
         self.key_arr = self.temp_key_arr[:self.size_of_key].astype(int)
                 
     def print_key_alice(self):
@@ -84,7 +84,7 @@ class alice_con:
                     self.inter_error_distances.append(self.error_locations[self.errors - 1] - self.error_locations[self.errors - 2])
                 #print("Error detected in keys. Bob's bit: ", check_bits_bob[i], "Alice's bit: ", self.check_bits_alice[i], "No. of errors detected: ", self.errors)
         self.percent_error_rate = 100*(self.errors)/(self.size_of_check_bits)
-        self.key_efficiency = 100.00*(self.size_of_key+1)/(self.s_length)
+        self.key_efficiency = 100.00*(self.size_of_key)/(self.s_length)
         #print("Places in which check bits differ: ", np.bitwise_xor(self.check_bits_alice, check_bits_bob))
         return self.key_efficiency, self.percent_error_rate
         
@@ -151,11 +151,12 @@ class bob_con:
         return np.matmul(H, state_vec)
         
     def key_gen_bob(self, alice_basis_seq):
+        self.size_of_key = 0
         self.temp_key_arr = np.zeros(self.s_length)
         for i in range(self.s_length):
-            if(self.basis_seq_b[i] == alice_basis_seq[i]):
+            if self.basis_seq_b[i] == alice_basis_seq[i]:
+                self.temp_key_arr[self.size_of_key] = self.meas_seq_b[i]
                 self.size_of_key += 1
-                self.temp_key_arr[i] = self.meas_seq_b[i]
         self.key_arr = self.temp_key_arr[:self.size_of_key].astype(int)
 
     def print_key_bob(self):
@@ -165,7 +166,7 @@ class bob_con:
         print("\n Size of Bob's (full) key is: ", self.size_of_key+1)
         
     def pre_key_check(self):
-        self.size_of_check_bits = np.ceil((self.size_of_key-1)/2).astype(int)
+        self.size_of_check_bits = self.size_of_key // 2
         self.check_bits = self.key_arr[:self.size_of_check_bits].astype(int)
         self.rem_key_bob = self.key_arr[self.size_of_check_bits:].astype(int)
         return self.check_bits

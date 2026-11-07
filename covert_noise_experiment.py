@@ -57,7 +57,7 @@ class covert_noise_experiment(base.qkd_experiment):
 
 def main():
     test_msg = [1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0, 1, 0, 1, 1, 0, 1, 1, 0]
-    test_trigger_length = 10
+    test_trigger_length = 7
     QBERs = []
     num_experiments = 1
 
