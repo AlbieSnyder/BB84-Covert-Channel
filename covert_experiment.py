@@ -17,6 +17,8 @@ class covert_experiment(base.qkd_experiment):
     def build_phase(self):
         super().build_phase()
         self.a0 = qkd_covert_alice.covert_alice(self.s_length, self.PSK, self.trigger_length, self.msg)
+        if (self.a0.msg_over_capacity):
+            print("Message exceeds expected capacity")
         self.b0 = qkd_covert_bob.covert_bob(self.s_length, self.PSK, self.trigger_length)
 
     def key_generation_phase(self):
@@ -44,7 +46,7 @@ def main():
     QBERs = []
 
     for i in range(1):
-        experiment = covert_experiment(2048, test_msg, test_trigger_length)
+        experiment = covert_experiment(8192, test_msg, test_trigger_length)
         experiment.execute()
         QBERs.append(experiment.calc_perc_error)
 
