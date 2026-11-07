@@ -49,7 +49,7 @@ class noisy_q_channel(bb.q_channel):
         self.temp_st_mtx = self.st_mtx_in
         self.length = np.shape(self.temp_st_mtx[0])[0] 
         inj_error_rate = 0.15*(1 + np.random.uniform(-0.25,0.25))
-        self.cor = random.sample(range(1,self.length), np.floor(inj_error_rate*self.length).astype(int))
+        self.cor = random.sample(range(self.length), np.floor(inj_error_rate*self.length).astype(int))
         for i in self.cor:
             self.temp_st_mtx[0,i], self.temp_st_mtx[1,i] = self.temp_st_mtx[1,i], self.temp_st_mtx[0,i]
             # this is an X error. 
@@ -65,7 +65,7 @@ class variable_noisy_q_channel(noisy_q_channel):
         self.temp_st_mtx = self.st_mtx_in
         self.length = np.shape(self.temp_st_mtx[0])[0] 
         inj_error_rate = self.error_rate*(1 + np.random.uniform(-0.25,0.25))
-        self.cor = random.sample(range(1,self.length), np.floor(inj_error_rate*self.length).astype(int))
+        self.cor = random.sample(range(self.length), np.floor(inj_error_rate*self.length).astype(int))
         for i in self.cor:
             self.temp_st_mtx[0,i], self.temp_st_mtx[1,i] = self.temp_st_mtx[1,i], self.temp_st_mtx[0,i]
             # this is an X error. 
