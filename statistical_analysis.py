@@ -56,7 +56,7 @@ def test(k):
     print(f"Average Baseline QBER for k={k}: {str(numpy.mean(baseline_QBERs))}% \n")
     print(f"Average Covert QBER for k={k}: {str(numpy.mean(covert_QBERs))}% \n")
     print(f"For k={k}: {str(scipy.stats.ks_2samp(baseline_QBERs, covert_QBERs))} \n")
-    print(f"Expected Covert Capacity for k={k} = {s_length / 2**k}")
+    print(f"Expected Covert Capacity for k={k} = {s_length / (2**k + k - 1)}")
     print(f"Actual Covert Capacity for k={k} = {str(numpy.mean(covert_actual_capacities))}")
     numpy.save(f"baseline_qbers_k{k}.npy", baseline_QBERs)
     numpy.save(f"covert_qbers_k{k}.npy", covert_QBERs)
