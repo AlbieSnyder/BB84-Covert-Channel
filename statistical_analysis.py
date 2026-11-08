@@ -19,11 +19,10 @@ def inter_error_analysis(baseline_inter_errors, covert_inter_errors, k):
     print(f"Median baseline distance: {str(numpy.median(baseline_inter_errors))}, Median covert distances: {str(numpy.median(covert_inter_errors))}")
     print(f"  p-value={result.pvalue:.6f} {'DETECTABLE' if result.pvalue < 0.05 else 'UNDETECTABLE'}")
 
-def test(k):
+def test(k, experiment_count=1000):
     #Global Parameters
     error_rate = 0.03
     s_length = 65536
-    experiment_count = 1000
 
     #Baseline Parameters
     baseline_QBERs = []
@@ -47,7 +46,7 @@ def test(k):
         baseline_QBERs.append(b_exp.calc_perc_error)
         baseline_inter_errors.extend(b_exp.a0.inter_error_distances)
 
-        if i % 5 == 0:
+        if i % 250 == 0:
              print(i)
 
     QBER_detectability_analysis(baseline_QBERs, covert_QBERs, test_trigger_length)
@@ -64,8 +63,13 @@ def test(k):
     numpy.save(f"covert_inter_error_distances_k{k}.npy", covert_inter_errors)
     numpy.save(f"covert_actual_capacity_k{k}.npy", covert_actual_capacities)
 
+
+def test_range():
+     for i in range(6, 14):
+          test(i)
+
 def main():
-        test(int(sys.argv[1]))
+        test(int(sys.argv[1]), int(sys.argv[2]))
 
 if __name__ == '__main__':
     main()
