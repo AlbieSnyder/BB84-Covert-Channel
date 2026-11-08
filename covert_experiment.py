@@ -4,6 +4,7 @@ import qkd_covert_alice
 import qkd_covert_bob
 import copy
 import numpy
+import warnings
 
 class covert_experiment(base.qkd_experiment):
 
@@ -17,8 +18,6 @@ class covert_experiment(base.qkd_experiment):
     def build_phase(self):
         super().build_phase()
         self.a0 = qkd_covert_alice.covert_alice(self.s_length, self.PSK, self.trigger_length, self.msg)
-        if (self.a0.msg_over_capacity):
-            print("Message exceeds expected capacity")
         self.b0 = qkd_covert_bob.covert_bob(self.s_length, self.PSK, self.trigger_length)
 
     def key_generation_phase(self):

@@ -20,7 +20,15 @@ class covert_bob(bb.bob_con):
             if self.state_machine.feed(basis):
                 self.full_msg.append(int(alice_bases[i + 1]) ^ self.state_machine.next_keystream_bit())
                 self.actual_capacity += 1
+                self.truncated = False
+        if self.preamble_length == 0 or len(self.full_msg) < self.preamble_length:
+            # Not enough triggers to read the length header
+            self.msg = []
+            self.truncated = True
+            return
         preamble = self.full_msg[:self.preamble_length]
         msg_length = int(''.join(str(i) for i in preamble), 2)
-        self.msg = self.full_msg[self.preamble_length:self.preamble_length+msg_length]
+        self.msg = self.full_msg[self.preamble_length:self.preamble_length + msg_length]
+        if len(self.msg) < msg_length:
+            self.truncated = True   # header read, but the message was cut short
         

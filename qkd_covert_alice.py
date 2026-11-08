@@ -17,11 +17,6 @@ class covert_alice(bb.alice_con):
         preamble_string = bin(len(msg))[2:].zfill(preamble_length)
         self.preamble = [int(bit) for bit in preamble_string]
         self.full_msg = self.preamble + msg
-        self.expected_capacity = s_length / ((2 ** trigger_length) + trigger_length - 1)
-        if len(self.full_msg) >= self.expected_capacity - 3 * math.sqrt(self.expected_capacity):
-            self.msg_over_capacity = True
-        else:
-            self.msg_over_capacity = False
 
     def misreport(self):
         counter = 0
