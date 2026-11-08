@@ -31,24 +31,14 @@ class alice_con:
         self.states_seq_a = np.random.randint(low = 0, high = 2, size = self.s_length)
         
     def generate_qubit_stream(self):
-        for i in range(self.s_length):
-            basis = self.basis_seq_a[i]
-            state = self.states_seq_a[i]
-            #print("\n basis = ", basis, "\n state = ", state)
-            ket0 = np.array([1.0, 0.0])
-            ket1 = np.array([0.0, 1.0])
-            k = 1.0/np.sqrt(2.0)
-            H = np.array([[k,k],[k,(-1*k)]])           
-            
-            if(basis == 0 and state == 0):
-                self.state_matrix[:,i] = ket0 
-            elif(basis == 0 and state == 1):
-                self.state_matrix[:,i] = ket1
-            elif(basis == 1 and state == 0):
-                self.state_matrix[:,i] = self.hadamard_alice(ket0)
-            else:
-                self.state_matrix[:,i] = self.hadamard_alice(ket1)
-    
+    # Build all qubits at once: one column per qubit.
+    # Start with |0> or |1> from Alice's bit, then apply H to the diagonal-basis columns.
+        idx = np.arange(self.s_length)
+        self.state_matrix = np.zeros((2, self.s_length))
+        self.state_matrix[self.states_seq_a, idx] = 1.0
+        diag = self.basis_seq_a == 1
+        self.state_matrix[:, diag] = self.hadamard_alice(self.state_matrix[:, diag])
+
     def hadamard_alice(self, state_vec):
         k = 1.0/np.sqrt(2.0)
         H = np.array([[k,k],[k,(-1*k)]])
@@ -120,44 +110,25 @@ class bob_con:
         self.temp_meas_seq_b = np.zeros(self.s_length)
         
     def meas_qubit_stream_bob(self):
-        for j in range(self.s_length):
-            st = self.state_matrix[:,j]
-            if(self.basis_seq_b[j] == 0):
-                self.temp_meas_seq_b[j] = self.meas_single_qubit_bob(st)
-            else:
-                st = self.hadamard_bob(st)
-                self.temp_meas_seq_b[j] = self.meas_single_qubit_bob(st)
-        self.meas_seq_b = self.temp_meas_seq_b.astype(int)
-                
-        #return self.meas_seq_b.astype(int)
-    
-    def meas_single_qubit_bob(self, state_vec):
-        a = np.square(np.absolute(state_vec[0]))
+        # Measure all qubits at once: apply H to the columns Bob measures in the diagonal basis, then each outcome is 0 with probability |amplitude of |0>|^2.
+        st = self.state_matrix.copy()
+        diag = self.basis_seq_b == 1
+        st[:, diag] = self.hadamard_bob(st[:, diag])
+        p0 = np.square(np.absolute(st[0]))
         thres = 10**(-3)
-        if(np.absolute(a-0) < thres):
-            res = 1
-        elif(np.absolute(a-1) < thres):
-            res = 0
-        elif(np.random.uniform() < a):
-            res = 0
-        else:
-            res = 1
-        #print("values of a: ", a)
-        return res
-    
+        p0 = np.where(p0 < thres, 0.0, np.where(p0 > 1 - thres, 1.0, p0))  # snap near-certain outcomes, as before
+        self.meas_seq_b = (np.random.uniform(size=self.s_length) >= p0).astype(int)
+
     def hadamard_bob(self, state_vec):
         k = 1.0/np.sqrt(2.0)
         H = np.array([[k,k],[k,(-1*k)]])
         return np.matmul(H, state_vec)
         
     def key_gen_bob(self, alice_basis_seq):
-        self.size_of_key = 0
-        self.temp_key_arr = np.zeros(self.s_length)
-        for i in range(self.s_length):
-            if self.basis_seq_b[i] == alice_basis_seq[i]:
-                self.temp_key_arr[self.size_of_key] = self.meas_seq_b[i]
-                self.size_of_key += 1
-        self.key_arr = self.temp_key_arr[:self.size_of_key].astype(int)
+        # Keep only the bits where the bases match, in order
+        match = self.basis_seq_b == np.asarray(alice_basis_seq)
+        self.key_arr = self.meas_seq_b[match].astype(int)
+        self.size_of_key = self.key_arr.size
 
     def print_key_bob(self):
         print("Bob's full key ")

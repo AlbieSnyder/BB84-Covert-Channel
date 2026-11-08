@@ -19,15 +19,16 @@ class noisy_alice_con(bb.alice_con):
         super().__init__(s_length)
         self.P_H_FAIL = P_H_FAIL
     
-    def hadamard_alice(self, state_vec):
-        k = 1.0/np.sqrt(2.0)
-        H = np.array([[k,k],[k,(-1*k)]])
-        I = np.array([[0.0,1.0],[1.0, 0.0]])
-        p = np.random.uniform(0.0, 1.0)
-        if(p <= self.P_H_FAIL):
-            return np.matmul(I, state_vec)
-        else:            
-            return np.matmul(H, state_vec)
+        def hadamard_alice(self, states):
+            # Works on a 2 x m matrix of qubits: each column independently fails
+            # with probability P_H_FAIL, in which case X is applied instead of H.
+            k = 1.0/np.sqrt(2.0)
+            H = np.array([[k,k],[k,(-1*k)]])
+            X = np.array([[0.0,1.0],[1.0, 0.0]])
+            out = H @ states
+            fail = np.random.uniform(0.0, 1.0, size=states.shape[1]) <= self.P_H_FAIL
+            out[:, fail] = X @ states[:, fail]
+            return out
 
 class noisy_bob_con(bb.bob_con):
     
@@ -35,15 +36,16 @@ class noisy_bob_con(bb.bob_con):
         super().__init__(s_length)
         self.P_H_FAIL = P_H_FAIL
     
-    def hadamard_bob(self, state_vec):
-        k = 1.0/np.sqrt(2.0)
-        H = np.array([[k,k],[k,(-1*k)]])
-        I = np.array([[0.0,1.0],[1.0, 0.0]])
-        p = np.random.uniform(0.0, 1.0)
-        if(p <= self.P_H_FAIL):
-            return np.matmul(I, state_vec)
-        else:            
-            return np.matmul(H, state_vec)
+        def hadamard_bob(self, states):
+            # Works on a 2 x m matrix of qubits: each column independently fails
+            # with probability P_H_FAIL, in which case X is applied instead of H.
+            k = 1.0/np.sqrt(2.0)
+            H = np.array([[k,k],[k,(-1*k)]])
+            X = np.array([[0.0,1.0],[1.0, 0.0]])
+            out = H @ states
+            fail = np.random.uniform(0.0, 1.0, size=states.shape[1]) <= self.P_H_FAIL
+            out[:, fail] = X @ states[:, fail]
+            return out
 
 
 class noisy_q_channel(bb.q_channel):
@@ -53,8 +55,7 @@ class noisy_q_channel(bb.q_channel):
         self.length = np.shape(self.temp_st_mtx[0])[0] 
         inj_error_rate = 0.15*(1 + np.random.uniform(-0.25,0.25))
         self.cor = random.sample(range(self.length), np.floor(inj_error_rate*self.length).astype(int))
-        for i in self.cor:
-            self.temp_st_mtx[:, i] = XZ @ self.temp_st_mtx[:, i]  # Y error (up to global phase)
+        self.temp_st_mtx[:, self.cor] = XZ @ self.temp_st_mtx[:, self.cor]  # Y error (up to global phase)
             
         self.out_st_mtx = self.temp_st_mtx        
 
@@ -68,8 +69,7 @@ class variable_noisy_q_channel(noisy_q_channel):
         self.length = np.shape(self.temp_st_mtx[0])[0] 
         inj_error_rate = self.error_rate*(1 + np.random.uniform(-0.25,0.25))
         self.cor = random.sample(range(self.length), np.floor(inj_error_rate*self.length).astype(int))
-        for i in self.cor:
-            self.temp_st_mtx[:, i] = XZ @ self.temp_st_mtx[:, i]  # Y error (up to global phase)
+        self.temp_st_mtx[:, self.cor] = XZ @ self.temp_st_mtx[:, self.cor]  # Y error (up to global phase)
             
         self.out_st_mtx = self.temp_st_mtx
 
