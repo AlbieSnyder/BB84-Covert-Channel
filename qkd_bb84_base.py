@@ -31,8 +31,8 @@ class alice_con:
         self.states_seq_a = np.random.randint(low = 0, high = 2, size = self.s_length)
         
     def generate_qubit_stream(self):
-    # Build all qubits at once: one column per qubit.
-    # Start with |0> or |1> from Alice's bit, then apply H to the diagonal-basis columns.
+        # Build all qubits at once: one column per qubit.
+        # Start with |0> or |1> from Alice's bit, then apply H to the diagonal-basis columns.
         idx = np.arange(self.s_length)
         self.state_matrix = np.zeros((2, self.s_length))
         self.state_matrix[self.states_seq_a, idx] = 1.0
@@ -104,8 +104,7 @@ class bob_con:
     def seq_init_bob(self):
         self.basis_seq_b = np.random.randint(low = 0, high = 2, size = self.s_length)
         self.meas_seq_b = np.zeros(self.s_length)
-        self.temp_meas_seq_b = np.zeros(self.s_length)
-        
+                
     def meas_qubit_stream_bob(self):
         # Measure all qubits at once: apply H to the columns Bob measures in the diagonal basis, then each outcome is 0 with probability |amplitude of |0>|^2.
         st = self.state_matrix.copy()
