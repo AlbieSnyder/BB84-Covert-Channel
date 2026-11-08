@@ -6,6 +6,7 @@ import os
 import json
 import datetime
 import sys
+import random
 
 class Tee:
     """Writes everything to both the console and a log file."""
@@ -87,6 +88,13 @@ def test(k, experiment_count=1000, out_dir="Data"):
     numpy.save(os.path.join(out_dir, f"baseline_inter_error_distances_k{k}.npy"), baseline_inter_errors)
     numpy.save(os.path.join(out_dir, f"covert_inter_error_distances_k{k}.npy"), covert_inter_errors)
     numpy.save(os.path.join(out_dir, f"covert_actual_capacity_k{k}.npy"), covert_actual_capacities)
+    return {
+    "k": k,
+    "gap": numpy.mean(covert_QBERs) - numpy.mean(baseline_QBERs),
+    "qber_p": scipy.stats.ks_2samp(baseline_QBERs, covert_QBERs).pvalue,
+    "inter_p": scipy.stats.ks_2samp(baseline_inter_errors, covert_inter_errors).pvalue,
+    "capacity": numpy.mean(covert_actual_capacities),
+    }
 
 def make_run_dir():
     stamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -94,34 +102,67 @@ def make_run_dir():
     os.makedirs(run_dir, exist_ok=False)   # fails rather than overwrite if the folder exists
     return run_dir
 
+def summarise(results, k_values, run_dir):
+    import csv
+    with open(os.path.join(run_dir, "summary.csv"), "w", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=["rep", "seed", "k", "gap", "qber_p", "inter_p", "capacity"])
+        w.writeheader()
+        w.writerows(results)
+
+    print("\n===== Summary across repeats =====")
+    print(f"{'k':>3} {'reps':>5} {'mean gap':>9} {'QBER det.':>10} {'median QBER p':>14} "
+          f"{'inter det.':>11} {'median inter p':>15}")
+    for k in k_values:
+        rk = [r for r in results if r["k"] == k]
+        qp = numpy.array([r["qber_p"] for r in rk])
+        ip = numpy.array([r["inter_p"] for r in rk])
+        gap = numpy.mean([r["gap"] for r in rk])
+        print(f"{k:>3} {len(rk):>5} {gap:>9.4f} {numpy.mean(qp < 0.05):>9.0%} {numpy.median(qp):>14.3g} "
+              f"{numpy.mean(ip < 0.05):>10.0%} {numpy.median(ip):>15.3g}")
 
 def main():
     # Usage:
-    #   python statistical_analysis.py <k> <sessions>
-    #   python statistical_analysis.py <k_start> <k_end> <sessions>   (inclusive range)
+    # python statistical_analysis.py <k> <sessions> [repeats]
+    # python statistical_analysis.py <k_start> <k_end> <sessions> [repeats]
     args = [int(a) for a in sys.argv[1:]]
-    if len(args) == 2:
+    if len(args) in (2, 3) and (len(args) == 2 or args[1] >= 10):
+        # single k: <k> <sessions> [repeats]
         k_values, sessions = [args[0]], args[1]
-    elif len(args) == 3:
+        repeats = args[2] if len(args) == 3 else 1
+    elif len(args) in (3, 4):
         k_values, sessions = list(range(args[0], args[1] + 1)), args[2]
+        repeats = args[3] if len(args) == 4 else 1
     else:
-        sys.exit("Usage: statistical_analysis.py <k> <sessions>  or  <k_start> <k_end> <sessions>")
+        sys.exit("Usage: <k> <sessions> [repeats]  or  <k_start> <k_end> <sessions> [repeats]")
 
     run_dir = make_run_dir()
+    base_seed = int(datetime.datetime.now().timestamp())
 
     with open(os.path.join(run_dir, "params.json"), "w") as f:
-        json.dump({"k_values": k_values, "sessions": sessions, "s_length": 65536,
-                   "error_rate": 0.03, "argv": sys.argv}, f, indent=2)
+        json.dump({"k_values": k_values, "sessions": sessions, "repeats": repeats,
+                   "s_length": 65536, "error_rate": 0.03, "base_seed": base_seed,
+                   "argv": sys.argv}, f, indent=2)
 
     log_file = open(os.path.join(run_dir, "log.txt"), "w")
     original_stdout = sys.stdout
     sys.stdout = Tee(original_stdout, log_file)
+    results = []
     try:
         print(f"Run folder: {run_dir}")
-        for k in k_values:
-            test(k, sessions, out_dir=run_dir)
+        for rep in range(1, repeats + 1):
+            seed = base_seed + rep
+            numpy.random.seed(seed)
+            random.seed(seed)
+            rep_dir = os.path.join(run_dir, f"rep_{rep:02d}")
+            os.makedirs(rep_dir)
+            print(f"\n===== Repeat {rep}/{repeats} (seed {seed}) =====")
+            for k in k_values:
+                r = test(k, sessions, out_dir=rep_dir)
+                r["rep"], r["seed"] = rep, seed
+                results.append(r)
+        summarise(results, k_values, run_dir)
     finally:
-        sys.stdout = original_stdout   # restore the console even if a run crashes
+        sys.stdout = original_stdout
         log_file.close()
 
 
