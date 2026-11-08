@@ -45,14 +45,11 @@ class alice_con:
         return np.matmul(H, state_vec)     
     
     def key_gen_alice(self, bob_basis_seq):
-        self.temp_key_arr = np.zeros(self.s_length)
-        self.size_of_key = 0
-        for i in range(self.s_length):
-            if self.basis_seq_a[i] == bob_basis_seq[i]:
-                self.temp_key_arr[self.size_of_key] = self.states_seq_a[i]
-                self.size_of_key += 1
-        self.key_arr = self.temp_key_arr[:self.size_of_key].astype(int)
-                
+        # Keep only the bits where the bases match, in order
+        match = self.basis_seq_a == np.asarray(bob_basis_seq)
+        self.key_arr = self.states_seq_a[match].astype(int)
+        self.size_of_key = self.key_arr.size
+                    
     def print_key_alice(self):
         print("Alice's full key ")
         for i in range(self.size_of_key):
