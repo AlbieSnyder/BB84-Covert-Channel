@@ -19,16 +19,16 @@ class noisy_alice_con(bb.alice_con):
         super().__init__(s_length)
         self.P_H_FAIL = P_H_FAIL
     
-        def hadamard_alice(self, states):
-            # Works on a 2 x m matrix of qubits: each column independently fails
-            # with probability P_H_FAIL, in which case X is applied instead of H.
-            k = 1.0/np.sqrt(2.0)
-            H = np.array([[k,k],[k,(-1*k)]])
-            X = np.array([[0.0,1.0],[1.0, 0.0]])
-            out = H @ states
-            fail = np.random.uniform(0.0, 1.0, size=states.shape[1]) <= self.P_H_FAIL
-            out[:, fail] = X @ states[:, fail]
-            return out
+    def hadamard_alice(self, states):
+        # Works on a 2 x m matrix of qubits: each column independently fails
+        # with probability P_H_FAIL, in which case X is applied instead of H.
+        k = 1.0/np.sqrt(2.0)
+        H = np.array([[k,k],[k,(-1*k)]])
+        X = np.array([[0.0,1.0],[1.0, 0.0]])
+        out = H @ states
+        fail = np.random.uniform(0.0, 1.0, size=states.shape[1]) <= self.P_H_FAIL
+        out[:, fail] = X @ states[:, fail]
+        return out
 
 class noisy_bob_con(bb.bob_con):
     
@@ -36,16 +36,16 @@ class noisy_bob_con(bb.bob_con):
         super().__init__(s_length)
         self.P_H_FAIL = P_H_FAIL
     
-        def hadamard_bob(self, states):
-            # Works on a 2 x m matrix of qubits: each column independently fails
-            # with probability P_H_FAIL, in which case X is applied instead of H.
-            k = 1.0/np.sqrt(2.0)
-            H = np.array([[k,k],[k,(-1*k)]])
-            X = np.array([[0.0,1.0],[1.0, 0.0]])
-            out = H @ states
-            fail = np.random.uniform(0.0, 1.0, size=states.shape[1]) <= self.P_H_FAIL
-            out[:, fail] = X @ states[:, fail]
-            return out
+    def hadamard_bob(self, states):
+        # Works on a 2 x m matrix of qubits: each column independently fails
+        # with probability P_H_FAIL, in which case X is applied instead of H.
+        k = 1.0/np.sqrt(2.0)
+        H = np.array([[k,k],[k,(-1*k)]])
+        X = np.array([[0.0,1.0],[1.0, 0.0]])
+        out = H @ states
+        fail = np.random.uniform(0.0, 1.0, size=states.shape[1]) <= self.P_H_FAIL
+        out[:, fail] = X @ states[:, fail]
+        return out
 
 
 class noisy_q_channel(bb.q_channel):
