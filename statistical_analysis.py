@@ -37,7 +37,7 @@ def inter_error_analysis(baseline_inter_errors, covert_inter_errors, k):
     print(f"Median baseline distance: {str(numpy.median(baseline_inter_errors))}, Median covert distances: {str(numpy.median(covert_inter_errors))}")
     print(f"  p-value={result.pvalue:.6f} {'DETECTABLE' if result.pvalue < 0.05 else 'UNDETECTABLE'}")
 
-def test(k, experiment_count=1000, out_dir="Data"):
+def test(k, experiment_count=1000, out_dir="Data", jitter=0.25, rep=1):
     #Global Parameters
     error_rate = 0.03
     s_length = 65536
