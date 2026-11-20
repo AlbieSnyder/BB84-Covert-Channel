@@ -60,14 +60,17 @@ class noisy_q_channel(bb.q_channel):
         self.out_st_mtx = self.temp_st_mtx        
 
 #Modified subclass noisy_q_channel to accept variable error rate (0.00 to 1.00)
+#and a configurable session-to-session drift: each session's error rate is drawn
+#uniformly from error_rate * (1 +/- jitter)
 class variable_noisy_q_channel(noisy_q_channel):
-    def __init__(self, error_rate):
+    def __init__(self, error_rate, jitter=0.25):
         self.error_rate = error_rate
+        self.jitter = jitter
 
     def corrupt_state(self):
         self.temp_st_mtx = self.st_mtx_in
         self.length = np.shape(self.temp_st_mtx[0])[0] 
-        inj_error_rate = self.error_rate*(1 + np.random.uniform(-0.25,0.25))
+        inj_error_rate = self.error_rate*(1 + np.random.uniform(-self.jitter, self.jitter))
         self.cor = random.sample(range(self.length), np.floor(inj_error_rate*self.length).astype(int))
         self.temp_st_mtx[:, self.cor] = XZ @ self.temp_st_mtx[:, self.cor]  # Y error (up to global phase)
             
