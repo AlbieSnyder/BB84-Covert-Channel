@@ -62,12 +62,12 @@ def test(k, experiment_count=1000, out_dir="Data", jitter=0.25, rep=1):
               f"{expected_capacity:.1f}; it may be truncated (does not affect QBER statistics).")
 
     for i in range(experiment_count):
-        c_exp = covert_experiment.covert_noise_experiment(s_length, test_msg, test_trigger_length, error_rate)
+        c_exp = covert_experiment.covert_noise_experiment(s_length, test_msg, test_trigger_length, error_rate, jitter=jitter, session_id=f"r{rep}s{i}")
         c_exp.execute()
         covert_QBERs.append(c_exp.calc_perc_error)
         covert_inter_errors.extend(c_exp.a0.inter_error_distances)
         covert_actual_capacities.append(c_exp.b0.actual_capacity)
-        b_exp = baseline_experiment.variable_noisy_qkd_experiment(s_length, error_rate)
+        b_exp = baseline_experiment.variable_noisy_qkd_experiment(s_length, error_rate, jitter=jitter)
         b_exp.execute()
         baseline_QBERs.append(b_exp.calc_perc_error)
         baseline_inter_errors.extend(b_exp.a0.inter_error_distances)
@@ -90,6 +90,7 @@ def test(k, experiment_count=1000, out_dir="Data", jitter=0.25, rep=1):
     numpy.save(os.path.join(out_dir, f"covert_actual_capacity_k{k}.npy"), covert_actual_capacities)
     return {
     "k": k,
+    "jitter": jitter,
     "gap": numpy.mean(covert_QBERs) - numpy.mean(baseline_QBERs),
     "qber_p": scipy.stats.ks_2samp(baseline_QBERs, covert_QBERs).pvalue,
     "inter_p": scipy.stats.ks_2samp(baseline_inter_errors, covert_inter_errors).pvalue,
@@ -105,7 +106,7 @@ def make_run_dir():
 def summarise(results, k_values, run_dir):
     import csv
     with open(os.path.join(run_dir, "summary.csv"), "w", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=["rep", "seed", "k", "gap", "qber_p", "inter_p", "capacity"])
+        w = csv.DictWriter(f, fieldnames=["rep", "seed", "k", "jitter", "gap", "qber_p", "inter_p", "capacity"])
         w.writeheader()
         w.writerows(results)
 
@@ -124,7 +125,15 @@ def main():
     # Usage:
     # python statistical_analysis.py <k> <sessions> [repeats]
     # python statistical_analysis.py <k_start> <k_end> <sessions> [repeats]
-    args = [int(a) for a in sys.argv[1:]]
+    # Optional: --jitter=<half-width>  (default 0.25)
+    jitter = 0.25
+    raw = []
+    for a in sys.argv[1:]:
+        if a.startswith("--jitter="):
+            jitter = float(a.split("=", 1)[1])
+        else:
+            raw.append(a)
+    args = [int(a) for a in raw]
     if len(args) in (2, 3) and (len(args) == 2 or args[1] >= 10):
         # single k: <k> <sessions> [repeats]
         k_values, sessions = [args[0]], args[1]
@@ -133,14 +142,14 @@ def main():
         k_values, sessions = list(range(args[0], args[1] + 1)), args[2]
         repeats = args[3] if len(args) == 4 else 1
     else:
-        sys.exit("Usage: <k> <sessions> [repeats]  or  <k_start> <k_end> <sessions> [repeats]")
+        sys.exit("Usage: <k> <sessions> [repeats]  or  <k_start> <k_end> <sessions> [repeats] [--jitter=0.25]")
 
     run_dir = make_run_dir()
     base_seed = int(datetime.datetime.now().timestamp())
 
     with open(os.path.join(run_dir, "params.json"), "w") as f:
         json.dump({"k_values": k_values, "sessions": sessions, "repeats": repeats,
-                   "s_length": 65536, "error_rate": 0.03, "base_seed": base_seed,
+                   "s_length": 65536, "error_rate": 0.03, "jitter": jitter, "base_seed": base_seed,
                    "argv": sys.argv}, f, indent=2)
 
     log_file = open(os.path.join(run_dir, "log.txt"), "w")
@@ -157,7 +166,7 @@ def main():
             os.makedirs(rep_dir)
             print(f"\n===== Repeat {rep}/{repeats} (seed {seed}) =====")
             for k in k_values:
-                r = test(k, sessions, out_dir=rep_dir)
+                r = test(k, sessions, out_dir=rep_dir, jitter=jitter, rep=rep)
                 r["rep"], r["seed"] = rep, seed
                 results.append(r)
         summarise(results, k_values, run_dir)
