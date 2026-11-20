@@ -1,6 +1,6 @@
 # BB84 Covert Channel
 
-**Correction notice (Nov 2026):** Errors were found in the simulation code (sifting retained unmatched bits, the noise model omitted diagonal-basis errors, and the inter-error test pooled sessions incorrectly). The reported QBERs and detectability thresholds in v1 are incorrect. The core mechanism is unaffected. A revised version is in preparation; corrected code is in this repository in the v2 branch.
+**Correction notice (Nov 2026):** Errors were found in the simulation code (sifting retained unmatched bits, the noise model omitted diagonal-basis errors, and the inter-error test pooled sessions incorrectly). The reported QBERs and detectability thresholds in v1 are incorrect. The core mechanism is unaffected. A revised version is in preparation; code matching the v1 preprint is tagged v1-preprint. Corrections are in progress on master/v2.
 
 A covert channel embedded in the classical sifting phase of the BB84 Quantum Key Distribution protocol. The channel transmits hidden data by intentionally misreporting basis announcements, hiding the covert payload within the hardware's expected QBER noise floor.
 
