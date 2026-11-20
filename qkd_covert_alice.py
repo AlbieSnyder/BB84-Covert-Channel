@@ -3,14 +3,15 @@ import covert_channel
 import math
 
 class covert_alice(bb.alice_con):
-    def __init__(self, s_length, PSK, trigger_length, msg):
+    def __init__(self, s_length, PSK, trigger_length, msg, session_id=None):
         """
         PSK (String) - Pre-Shared Key
         k (int) - size of trigger
         msg (bit list) - covert message
+        session_id - per-session identifier for PRNG seeding (must match Bob's)
         """
         super().__init__(s_length)
-        self.state_machine = covert_channel.CovertStateMachine(PSK, trigger_length)
+        self.state_machine = covert_channel.CovertStateMachine(PSK, trigger_length, session_id)
         self.msg = msg
         self.covert_index = 0
         preamble_length = (s_length // 2**trigger_length).bit_length()

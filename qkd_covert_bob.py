@@ -2,13 +2,14 @@ import qkd_bb84_base as bb
 import covert_channel
 
 class covert_bob(bb.bob_con):
-    def __init__(self, s_length, PSK, trigger_length):
+    def __init__(self, s_length, PSK, trigger_length, session_id=None):
         """
         PSK (String) - Pre-Shared Key
         trigger_length (int) - size of trigger
+        session_id - per-session identifier for PRNG seeding (must match Alice's)
         """
         super().__init__(s_length)
-        self.state_machine = covert_channel.CovertStateMachine(PSK, trigger_length)
+        self.state_machine = covert_channel.CovertStateMachine(PSK, trigger_length, session_id)
         self.full_msg = list()
         self.preamble_length = (s_length // 2**trigger_length).bit_length()
 
