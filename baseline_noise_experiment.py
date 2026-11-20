@@ -1,20 +1,17 @@
-import qkd_experiment_base as base
-import qkd_bb84_base as bb
-import qkd_noise_model
-import copy
+import covert_noise_experiment
 import numpy
 
-class variable_noisy_qkd_experiment(qkd_noise_model.noisy_qkd_experiment):
-    
-    def __init__(self, s_length, error_rate):
-        #Setting P_H_FAIL to 0 as the covert model assumes perfect Hadamard gates
-        super().__init__(s_length, 0)
-        self.s_length = s_length
+class variable_noisy_qkd_experiment(covert_noise_experiment.covert_noise_experiment):
+    """
+    Baseline arm: the same classes and code path as the covert experiment,
+    with misreporting switched off. Alice announces her true bases, so the
+    only difference between the two arms is the covert channel itself.
+    """
+
+    def __init__(self, s_length, error_rate, jitter=0.25):
+        super().__init__(s_length, msg=[], trigger_length=1,
+                         noise_error_rate=error_rate, jitter=jitter, covert=False)
         self.error_rate = error_rate
-    
-    def build_phase(self):
-        super().build_phase()
-        self.q_c = qkd_noise_model.variable_noisy_q_channel(self.error_rate)
 
 def main():
     
