@@ -8,9 +8,13 @@ from collections import deque
 
 class CovertStateMachine:
     
-    def __init__(self, PSK, trigger_length):
-        self.trigger_PRNG = random.Random(PSK + "TRIGGER")
-        self.keystream_PRNG = random.Random(PSK + "KEYSTREAM")
+    def __init__(self, PSK, trigger_length, session_id=None):
+        # session_id gives each QKD session its own trigger and keystream sequence,
+        # so the keystream is never reused across sessions. None keeps the original
+        # (single-session) seeding for backward compatibility.
+        prefix = PSK if session_id is None else f"{PSK}|{session_id}|"
+        self.trigger_PRNG = random.Random(prefix + "TRIGGER")
+        self.keystream_PRNG = random.Random(prefix + "KEYSTREAM")
         self.trigger_length = trigger_length
         self.buffer = deque(maxlen=self.trigger_length)
         self.generate_trigger()
